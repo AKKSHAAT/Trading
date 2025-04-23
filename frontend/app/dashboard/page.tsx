@@ -1,8 +1,12 @@
+'use client'
 import React from 'react'
+import { SessionAuth } from "supertokens-auth-react/recipe/session";
 
 const Page = () => {
   return (
-    <div>Dashboard</div>
+    <SessionAuth>
+      <div>Dashboard</div>
+    </SessionAuth>
   )
 }
 
