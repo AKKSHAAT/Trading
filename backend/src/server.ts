@@ -1,14 +1,14 @@
-import express, { Request, Response } from "express";
+import express from "express";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 
 // Test route
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (req:any, res:any) => {
   res.json({ message: "Express + TypeScript Server is running" });
 });
 
