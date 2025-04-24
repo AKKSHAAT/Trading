@@ -1,8 +1,9 @@
-import {PrismaClient} from "@prisma/client"
-const prisma = new PrismaClient();
+import prisma from '../../lib/prisma'
+
+export const UserModel = prisma.user
 
 export async function createUser(username: string, email: string, password: string) {
-    return await prisma.user.create({
+    return await UserModel.create({
         data: {
             username,
             email,
@@ -12,19 +13,19 @@ export async function createUser(username: string, email: string, password: stri
 }
 
 export async function getUserById(id: number) {
-    return await prisma.user.findUnique({
+    return await UserModel.findUnique({
         where: {
             id
         }
     })
 }
-
+ 
 export async function getAllUsers(){
-    return await prisma.user.findMany()
+    return await UserModel.findMany()
 }
 
 export async function updateUser(id: number, username: string, email: string, password: string) {
-    return await prisma.user.update({
+    return await UserModel.update({
         where:{id},
         data:{
             username,
@@ -35,7 +36,7 @@ export async function updateUser(id: number, username: string, email: string, pa
 }
 
 export async function deleteUser(id: number){
-    return await prisma.user.delete({
+    return await UserModel.delete({
         where:{
             id
         }
