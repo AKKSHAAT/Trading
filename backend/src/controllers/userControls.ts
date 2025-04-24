@@ -24,7 +24,9 @@ export const handleUserRegistration = async (req: Request, res: Response) => {
       const newUser = await createUser(username, email, signUpResponse.user.id);
 
       // Create session with required parameters
-      const sessionData = await Session.createNewSession(req as SessionRequest, res, signUpResponse.user.id, {}, {sessionExpiry: 24*60*60, enableAntiCsrf: true}, true);
+      // const sessionData = await Session.createNewSession(req as SessionRequest, res, signUpResponse.user.id, {}, {sessionExpiry: 24*60*60, enableAntiCsrf: true}, true);
+      const sessionData = await Session.createNewSession(res, signUpResponse.user.id);
+
 
       return res.status(201).json({
         status: "success",
