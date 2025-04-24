@@ -13,9 +13,9 @@ if (typeof window !== "undefined") {
   SuperTokens.init({
     appInfo: {
       appName: "Trading",
-      apiDomain: "http://localhost:3000/",
-      websiteDomain: "http://localhost:3000/",
-      apiBasePath: "/auth",
+      apiDomain: "http://localhost:8000",
+      websiteDomain: "http://localhost:3000",
+      apiBasePath: "/api/auth",
       websiteBasePath: "/auth",
     },
     recipeList: [EmailPassword.init(), Session.init()],

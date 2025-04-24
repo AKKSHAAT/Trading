@@ -5,8 +5,8 @@ import supertokens from "supertokens-node";
 import Session from "supertokens-node/recipe/session";
 import EmailPassword from "supertokens-node/recipe/emailpassword";
 import { middleware } from "supertokens-node/framework/express";
+import { errorHandler } from "supertokens-node/framework/express";
 
-import userRoutes from "./routes/userRoutes";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -24,9 +24,9 @@ supertokens.init({
     // learn more about this on https://supertokens.com/docs/session/appinfo
     appName: "trading-backend",
     apiDomain: "http://localhost:8000",
-    websiteDomain: "http://localhost:8000",
-    apiBasePath: "/api/auth",
-    websiteBasePath: "/api/auth",
+    websiteDomain: "http://localhost:3000",
+    apiBasePath: "/api/auth",       
+    websiteBasePath: "/auth",
   },
   recipeList: [
     EmailPassword.init(), // initializes signin / sign up features
@@ -37,17 +37,22 @@ supertokens.init({
 
 app.use(
 	cors({
-		origin: "http://localhost:8000",
+		origin: "http://localhost:3000",
 		allowedHeaders: ["content-type", ...supertokens.getAllCORSHeaders()],
 		credentials: true,
 	}),
 );
 
-app.use(middleware());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/auth", userRoutes); 
+// app.use("/api/auth", userRoutes); 
+
+
+app.use(middleware());
+app.use(errorHandler());
+
 
 app.get("/", (req, res) => {
   res.json({ message: "Express + TypeScript server is running" });
