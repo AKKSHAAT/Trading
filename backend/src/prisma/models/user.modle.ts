@@ -1,12 +1,17 @@
-import {PrismaClient} from "@prisma/client"
-const prisma = new PrismaClient();
+import prisma from "../../lib/prisma"
 
 export async function createUser(username: string, email: string, password: string) {
     return await prisma.user.create({
         data: {
             username,
             email,
-            password
+            password,
+            portfolio:{
+                create:{
+                    invested_value: 0, 
+                    current_value: 1000
+                },
+            }
         }
     })
 }
