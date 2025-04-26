@@ -1,45 +1,51 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
+   connectionLimit = 10 
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") // Your NeonDB URL from environment variables
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  username String @unique
-  email String @unique
-  password String
-  portfolio Portfolio?
-  createdAt DateTime @default(now())
+  id         String   @id
+  email      String   @unique
+  createdAt  DateTime @default(now())
+  portfolio  Portfolio?
 }
 
 model Portfolio {
-  id Int @id @default(autoincrement())
-  userId Int 
-  user User @relation(fields: [userId], references: [id])
-  invested_value Float 
-  current_value Float @default(1000)
-  stocks Stock[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id])
+  entries    PortfolioEntry[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
-model Stock{
-  id Int @id @default(autoincrement())
-  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
-  portfolioId Int
-  stock_id Int
-  symbol String
-  qty Int
-  name String
+
+model Stock {
+  id      Int    @id @default(autoincrement())
+  symbol  String @unique
+  name    String
+  entries PortfolioEntry[]
+
+  @@index([name])
+}
+
+model PortfolioEntry {
+  id           Int      @id @default(autoincrement())
+  portfolioId  Int
+  stockId      Int
+  quantity     Int
+  avgBuyPrice  Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  portfolio    Portfolio @relation(fields: [portfolioId], references: [id])
+  stock        Stock     @relation(fields: [stockId], references: [id])
+
+  @@unique([portfolioId, stockId])
 }
