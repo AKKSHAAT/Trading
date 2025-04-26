@@ -1,14 +1,9 @@
-import express, { Router } from "express";
-import { handleUserRegistration } from "../controllers/userControls"; 
+import express from "express";
+import { verifySession } from "supertokens-node/recipe/session/framework/express";
+import { SessionRequest } from "supertokens-node/framework/express";
+import prisma from "../lib/prisma";
 
-const userRoutes: Router = express.Router();
+const userRoutes = express.Router();
 
-userRoutes.post("/register", async (req, res, next) => {
-    try {
-        await handleUserRegistration(req, res);
-    } catch (error) {
-        next(error);
-    }
-});
 
 export default userRoutes;
