@@ -7,6 +7,7 @@ import EmailPassword from "supertokens-node/recipe/emailpassword";
 import { middleware } from "supertokens-node/framework/express";
 import { errorHandler } from "supertokens-node/framework/express";
 import prisma from './lib/prisma';
+import userRoute from './routes/userRoutes';
 
 
 const app = express();
@@ -79,8 +80,13 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// app.use("/api/auth", userRoutes); 
+app.use('/api/user', userRoute);
+
 app.use(middleware());
 app.use(errorHandler());
+
 
 
 app.get("/", (req, res) => {

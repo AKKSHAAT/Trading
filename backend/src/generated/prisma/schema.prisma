@@ -1,0 +1,51 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../generated/prisma"
+  connectionLimit = 10
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Your NeonDB URL from environment variables
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  balance   Int        @default(1000)
+  createdAt DateTime   @default(now())
+  portfolio Portfolio?
+}
+
+model Portfolio {
+  id        String           @id @default(uuid())
+  userId    String           @unique
+  user      User             @relation(fields: [userId], references: [id])
+  entries   PortfolioEntry[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model Stock {
+  id      Int              @id @default(autoincrement())
+  symbol  String           @unique
+  name    String
+  entries PortfolioEntry[]
+
+  @@index([name])
+}
+
+model PortfolioEntry {
+  id          Int      @id @default(autoincrement())
+  portfolioId String
+  stockId     Int
+  quantity    Int
+  avgBuyPrice Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id])
+  stock     Stock     @relation(fields: [stockId], references: [id])
+
+  @@unique([portfolioId, stockId])
+}

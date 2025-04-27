@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import AuthWrapper from "./utils/AuthWrapper";
+import Navbar from "./_component_library/Navbar";
+
 import "./globals.css";
 
 
@@ -32,7 +34,10 @@ export default function RootLayout({
         >
           <AuthWrapper>
               {/*Your app components*/}
-              {children}
+              <div className="flex h-screen bg-black text-white">
+                <Navbar />  
+                {children}
+              </div>
           </AuthWrapper>
         </body>
     </html>
