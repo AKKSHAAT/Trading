@@ -5,7 +5,7 @@ import axios, {
 } from "axios";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -38,7 +38,7 @@ api.interceptors.response.use(
     // You could stop loading state here
     // e.g., dispatch(setLoading(false))
 
-    return response;
+    return response.data;
   },
   (error: AxiosError) => {
     // You could stop loading state here
