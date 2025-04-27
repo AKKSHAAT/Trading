@@ -1,68 +1,98 @@
 "use client";
-import React, { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { SessionAuth } from "supertokens-auth-react/recipe/session";
-import { fetchUserInfo } from "../utils/user-utils";
+import { fetchUserInfo, fetchPortfolio } from "../utils/user-utils";
+import { UserInfoResponse, UserPortfolio } from "../shared/types/user-types";
+import Loader from "../_component_library/Loader";
 
-
-
-
-const WalletBalanceCard = ({portfolio} : {portfolio: any}) => {
+const WalletBalanceCard = ({ balance }: {balance: number}) => {
   return (
     <div className="bg-gray-900 p-6 rounded-lg mb-8">
       <h2 className="text-xl text-gray-400 mb-2">CurrentValue</h2>
-      <p className="text-4xl font-bold">{portfolio.currentValue || 0}</p>
+      <p className="text-4xl font-bold">
+        ${balance ?? 0}
+      </p>
     </div>
-  )
-}
-const StockCard =({stock} : {stock: any}) => {
+  );
+};
 
-  useEffect(() => {
-    
-    const getUser = async () => {
-      const user = await fetchUserInfo()
-      console.log(user);
-      return user
-    }
-    getUser();
-
-  }, [])
+const StockCard = ({ stock }: { stock: UserPortfolio["holdings"][0] }) => {
   return (
     <div className="bg-gray-900 p-4 rounded-lg flex items-center justify-between">
       <div className="flex items-center">
-        <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center mr-4">
-          <span className="text-xl font-bold">{"₿"} {stock?.displaySymbol}</span>
+        <div className="w-10 h-10 rounded-full bg-green-900 flex items-center justify-center mr-4">
+          <span className="text-xl font-bold">{stock.symbol.charAt(0)}</span>
         </div>
         <div>
-          <p className="font-medium">{"Bitcoin"}  {stock?.name}</p>
-          <p className="text-sm text-gray-400">{"BTC"}  {stock?.symbol}</p>
+          <p className="font-medium">{stock.name}</p>
+          <p className="text-sm text-gray-400">{stock.symbol}</p>
         </div>
       </div>
       <div className="text-right">
-        <p className="font-medium">${"12,000.00"}   {stock?.currentValue}</p>
-        <p className="text-sm text-gray-400">0.50 BTC {stock?.qty}</p>
+        <p className="font-medium">${stock.currentValue.toFixed(2)}</p>
+        <p className="text-sm text-gray-400">
+          {stock.quantity} shares @ ${stock.avgBuyPrice.toFixed(2)}
+        </p>
       </div>
     </div>
-  )
-}
-
+  );
+};
 
 const Page = () => {
-  const [portfolio, setPortfolio] = React.useState({ currentValue: 0, holdings: []});
+  const [portfolio, setPortfolio] = useState<UserPortfolio | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const userData = await fetchUserInfo();
+        if (userData?.userId) {
+          const portfolioData = await fetchPortfolio(userData.userId);
+          setPortfolio(portfolioData);
+        }
+
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to load dashboard data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <SessionAuth>
-        <div className="flex-1 overflow-y-auto">
-          <div className="p-8">
-            <h1 className="text-4xl font-bold mb-8">Dashboard</h1>
+      <div className="flex-1 overflow-y-auto">
+        <div className="p-8">
+          <h1 className="text-4xl font-bold mb-8">Dashboard</h1>
 
-            <WalletBalanceCard portfolio={""}/>
-            <h2 className="text-2xl font-semibold mb-4 text-gray-400">
-              Holdings
-            </h2>
-            <div className="space-y-4">
-              <StockCard stock={""} />
-            </div>
-          </div>
+          {loading && <Loader />}
+          {error && <p className="text-red-500">{error}</p>}
+
+          {!loading && !error && portfolio && (
+            <>
+              <WalletBalanceCard balance={portfolio.balance} />
+              <h2 className="text-2xl font-semibold mb-4 text-gray-400">
+                Holdings
+              </h2>
+              <div className="space-y-4">
+
+                {portfolio.holdings.length === 0 && (
+                  <p>No stocks in your portfolio yet.</p>
+                )}
+                {portfolio.holdings.map((stock) => (
+                  <StockCard key={stock.id} stock={stock} />
+                ))}
+
+              </div>
+            </>
+          )}
         </div>
+      </div>
     </SessionAuth>
   );
 };

@@ -35,7 +35,7 @@ export default function RootLayout({
           <AuthWrapper>
               {/*Your app components*/}
               <div className="flex h-screen bg-black text-white">
-                <Navbar />
+                <Navbar />  
                 {children}
               </div>
           </AuthWrapper>
