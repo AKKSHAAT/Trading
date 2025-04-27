@@ -1,9 +1,8 @@
-import express from "express";
-import { verifySession } from "supertokens-node/recipe/session/framework/express";
-import { SessionRequest } from "supertokens-node/framework/express";
-import prisma from "../lib/prisma";
+import express, { Request, Response } from "express";
+import { handlePortfolio } from "../controllers/userControls";
 
-const userRoutes = express.Router();
+const router = express.Router();
 
+router.get('/:userId/portfolio', handlePortfolio);
 
-export default userRoutes;
+export default router;
