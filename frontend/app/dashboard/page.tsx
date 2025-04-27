@@ -1,6 +1,7 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { SessionAuth } from "supertokens-auth-react/recipe/session";
+import { fetchUserInfo } from "../utils/user-utils";
 
 
 
@@ -13,7 +14,18 @@ const WalletBalanceCard = ({portfolio} : {portfolio: any}) => {
     </div>
   )
 }
-const StockCard = ({stock} : {stock: any}) => {
+const StockCard =({stock} : {stock: any}) => {
+
+  useEffect(() => {
+    
+    const getUser = async () => {
+      const user = await fetchUserInfo()
+      console.log(user);
+      return user
+    }
+    getUser();
+
+  }, [])
   return (
     <div className="bg-gray-900 p-4 rounded-lg flex items-center justify-between">
       <div className="flex items-center">
