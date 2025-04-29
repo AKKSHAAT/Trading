@@ -4,6 +4,7 @@ import { SessionAuth } from "supertokens-auth-react/recipe/session";
 import { fetchUserInfo, fetchPortfolio } from "../utils/user-utils";
 import { UserInfoResponse, UserPortfolio } from "../shared/types/user-types";
 import Loader from "../_component_library/Loader";
+import useSocket from "@/app/_component_library/Socket";
 
 const WalletBalanceCard = ({ balance }: {balance: number}) => {
   return (
@@ -42,8 +43,27 @@ const Page = () => {
   const [portfolio, setPortfolio] = useState<UserPortfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const socket = useSocket();
 
   useEffect(() => {
+    if (!socket) return;
+    // listen for updates
+    socket.on('message', (data) => {
+      console.log('🔔 Message:', data);
+    });
+
+
+    socket.on('order_update', (data) => {
+      console.log('🔔 Order Update:', data);
+    });
+
+    // example: emit order to backend
+    socket.emit('place_order', {
+      symbol: 'AAPL',
+      quantity: 5,
+      type: 'buy',
+    });
+
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -60,9 +80,12 @@ const Page = () => {
         setLoading(false);
       }
     };
-
+    
     fetchData();
-  }, []);
+    return () => {
+      socket.off('order_update');
+    };
+  }, [socket]);
 
   return (
     <SessionAuth>

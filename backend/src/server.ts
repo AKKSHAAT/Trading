@@ -8,7 +8,10 @@ import { middleware } from "supertokens-node/framework/express";
 import { errorHandler } from "supertokens-node/framework/express";
 import prisma from './lib/prisma';
 import userRoute from './routes/userRoutes';
-
+// import stockRoutes from './routes/stockRoutes';
+// import { testFinnhubConnection } from './utils/finnhubUtils';
+import http from 'http';
+import { Server } from 'socket.io';
 
 const app = express();
 const PORT = process.env.PORT;
@@ -70,22 +73,33 @@ supertokens.init({
 
 
 app.use(
-	cors({
-		origin: "http://localhost:3000",
-		allowedHeaders: ["content-type", ...supertokens.getAllCORSHeaders()],
-		credentials: true,
-	}),
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    allowedHeaders: ["content-type", ...supertokens.getAllCORSHeaders()],
+  })
 );
 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// app.use("/api/auth", userRoutes); 
-app.use('/api/user', userRoute);
 
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3000',  
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+  },
+});
 app.use(middleware());
 app.use(errorHandler());
+
+// app.use("/api/auth", userRoutes); 
+app.use('/api/user', userRoute);
+// app.use('/api/stocks', stockRoutes);
 
 
 
@@ -132,6 +146,38 @@ async function connectDb(){
 }
 
 connectDb()
-app.listen(PORT, () => {
+
+
+io.on('connection', (socket) => {
+  console.log('✅ User connected:', socket.id);
+  socket.emit('message', 'Welcome to the trading app!');
+
+  socket.on('place_order', (data) => {
+    console.log('📥 Order received:', data);
+        // process order or broadcast something
+    io.emit('order_update', { message: 'Order processed', data });
+  });
+
+  socket.on('disconnect', () => {
+    console.log('❌ User disconnected:', socket.id);
+  });
+});
+
+
+
+
+server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+// app.listen(PORT, async () => {
+//   console.log(`Server is running on port ${PORT}`);
+  
+  // // Test Finnhub connection
+  // const finnhubConnected = await testFinnhubConnection();
+  // if (finnhubConnected) {
+  //   console.log('Finnhub API is ready to use');
+  // } else {
+  //   console.warn('Warning: Finnhub API connection failed. Check your API key and network connection.');
+  // }
+// });
