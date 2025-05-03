@@ -4,48 +4,8 @@ import { SessionAuth } from "supertokens-auth-react/recipe/session";
 import { getAllStocks } from "../utils/stock-api";
 import Loader from "../_component_library/Loader";
 import useSocket from "@/app/_component_library/Socket";
-// Interface for stock data
-interface Stock {
-  id: number;
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-  color: string; // Assuming color is a string representing the color
-}
+import StockCard, {Stock} from "@/components/StockCard";
 
-const StockCard = ({ stock }: { stock: Stock }) => {
-  const isPositive = stock.change >= 0;
-  console.log("StockCard props:", stock);
-  return (
-    <div className="bg-gray-900 p-4 rounded-lg flex items-center justify-between">
-      <div className="flex items-center">
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center mr-4"
-          style={{ backgroundColor: stock.color }}
-        >
-          <span className="text-xl font-bold">{stock.symbol.charAt(0)}</span>
-        </div>
-        <div>
-          <p className="font-medium">{stock.name}</p>
-          <p className="text-sm text-gray-400">{stock.symbol}</p>
-        </div>
-      </div>
-      <div className="text-right">
-        <p className="font-medium">${stock.price.toFixed(2)}</p>
-        <p
-          className={`text-sm ${
-            isPositive ? "text-green-400" : "text-red-400"
-          }`}
-        >
-          {isPositive ? "+" : ""}
-          {stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)
-        </p>
-      </div>
-    </div>
-  );
-};
 
 const Page = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);

@@ -6,13 +6,13 @@ interface TradingRequest extends Request {
         userId: string;
         symbol: string;
         quantity: number;
-        orderType: 'buy' | 'sell';
     }
 }
 
 export const handlePurchasing = async (req: TradingRequest, res: Response, next: NextFunction): Promise<void | Response> => {
-    const {userId, symbol, quantity, orderType} = req.body;
+    const {userId, symbol, quantity} = req.body;
     const currValue = 200;
+    
     const user = await prisma.user.findUnique({
         where:{id: userId},
         include:{portfolio: true}
@@ -21,114 +21,142 @@ export const handlePurchasing = async (req: TradingRequest, res: Response, next:
         return res.status(404).json({error:"user not found"})
     }
     try {
-        if(orderType == "buy"){
-            const totalValue = currValue * quantity;
-            const stock = await prisma.stock.findUnique({where:{symbol: symbol}})
-            if(!stock){
-                return res.status(404).json({error: "stock not found"})
-            }
-    
-            const portfolio = user.portfolio
-            if(user.balance >= totalValue){ 
-                const entry = await prisma.portfolioEntry.findUnique({
-                    where: {
-                        portfolioId_stockId: {
-                            portfolioId: portfolio?.id || "",
-                            stockId: stock.id
-                        }
-                    }
-                })
-                if(!entry && portfolio?.id){
-                    const deal = await prisma.portfolioEntry.create({
-                        data:{
-                            portfolioId: portfolio?.id,
-                            stockId: stock.id,
-                            quantity: quantity,
-                            avgBuyPrice: totalValue
-                        }
-                    })
-                    if(deal){
-                        return res.status(201).json({message: "purchasing done"})
-                    }
-                }else{
-                    const deal = await prisma.portfolioEntry.update({
-                        where:{id: entry?.id},
-                        data:{
-                            quantity: quantity,
-                            avgBuyPrice: totalValue
-                        }
-                    })
-                    if(deal){
-                        return res.status(201).json({message: "purchasing done"})
+        const transactionValue = currValue * quantity;
+        const stock = await prisma.stock.findUnique({where:{symbol: symbol}})
+        if(!stock){
+            return res.status(404).json({error: "stock not found"})
+        }
+
+        const portfolio = user.portfolio
+        if(user.balance >= transactionValue){  // has money to buy
+            const portfolioEntry = await prisma.portfolioEntry.findUnique({ // check if the user aledy owns the stock
+                where: {
+                    portfolioId_stockId: {
+                        portfolioId: portfolio?.id || "",
+                        stockId: stock.id
                     }
                 }
-            }else{
-                return res.status(404).json({error:"insufficient balance"})
+            })
+            if(!portfolioEntry && portfolio?.id){ // if the user does not own the stock, create a new entry
+                const stockBought = await prisma.portfolioEntry.create({
+                    data:{
+                        portfolioId: portfolio?.id,
+                        stockId: stock.id,
+                        quantity: quantity,
+                        avgBuyPrice: transactionValue
+                    }
+                })
+                const newBalance = await prisma.user.update({
+                    where:{id: userId},
+                    data:{
+                        balance: user.balance - transactionValue
+                    }
+                })
+                if(stockBought){
+                    return res.status(201).json({message: "Transaction successful", stockBought, newBalance})
+                }
+            }else{ // if the user already owns the stock, update the entry
+                const stockBought = await prisma.portfolioEntry.update({
+                    where:{id: portfolioEntry?.id},
+                    data:{
+                        quantity: quantity,
+                        avgBuyPrice: transactionValue
+                    }
+                })
+                const newBalance = await prisma.user.update({
+                    where:{id: userId},
+                    data:{
+                        balance: user.balance - transactionValue
+                    }
+                })
+                if(stockBought){
+                    return res.status(201).json({message: "purchasing done", newBalance})
+                }
             }
+        }else{
+            return res.status(400).json({error:"insufficient balance"})
+        
         }
     } catch (error) {
-        console.log(error)
+        console.log("Err: 🤚", error)
         return res.status(500).json({message:"something went wrong while purchasing", err:error})
     }   
 }
 
 export const handleSelling = async (req: TradingRequest, res: Response, next: NextFunction): Promise<void | Response> => {
-    const {userId, symbol, quantity, orderType} = req.body;
-    const currValue = 200;
-    const user = await prisma.user.findUnique({
-        where:{id: userId},
-        include:{portfolio: true}
-    })
-    try {
-        if(!user){
-            return res.status(404).json({error:"user not found"})
-        }
-        if(orderType == "sell"){
-            const sellAmount = currValue * quantity;
-            const stock = await prisma.stock.findUnique({where:{symbol:symbol}})
-            if(!stock){
-                return res.status(404).json({error:"stock not found"})
-            }
+    const {userId, symbol, quantity} = req.body;
+    const currValue = 230;
 
-            const portfolio = user.portfolio;
-            if(portfolio?.id){
-                const entry = await prisma.portfolioEntry.findUnique({
-                    where:{
-                        portfolioId_stockId:{
-                            portfolioId: portfolio?.id,
-                            stockId: stock.id
-                        }
-                    }
+    const user = await prisma.user.findUnique({
+                    where:{id: userId},
+                    include:{portfolio: true}
                 })
-                if(entry && entry?.quantity >= quantity){
-                    const newQuantity = entry.quantity - quantity
-                    const updatedAmt = user.balance + sellAmount;
-    
-                    if(newQuantity === 0){
-                        await prisma.portfolioEntry.delete({
-                            where:{id:entry.id}
-                        })
+    if(!user){
+        return res.status(404).json({error:"user not found"})
+    }
+    try {
+        const transactionValue = currValue * quantity;
+        const stock = await prisma.stock.findUnique({where:{symbol:symbol}})
+        if(!stock){
+            return res.status(404).json({error:"stock not found"})
+        }
+
+        const portfolio = user.portfolio;
+        if(portfolio?.id){
+            const portfolioEntry = await prisma.portfolioEntry.findUnique({
+                where:{
+                    portfolioId_stockId:{
+                        portfolioId: portfolio?.id,
+                        stockId: stock.id
                     }
-                    const deal = await prisma.portfolioEntry.update({
-                        where:{
-                            id:entry.id
-                        },
+                }
+            })
+            if (!portfolioEntry) return res.status(404).json({error:"stock not in portfolio"})
+                
+            if(portfolioEntry?.quantity >= quantity){
+                const newQuantity = portfolioEntry.quantity - quantity
+                const updatedAmt = user.balance + transactionValue;
+
+                if(newQuantity === 0){
+                    const transaction = await prisma.portfolioEntry.delete({
+                        where:{id:portfolioEntry.id}
+                    })
+
+                    const newBalance = await prisma.user.update({
+                        where:{id: userId},
                         data:{
-                            quantity: newQuantity,
-                            avgBuyPrice: updatedAmt
+                            balance: updatedAmt
                         }
                     })
-                    if(deal){
-                        return res.status(201).json({message:"selling successfull", updatedAmt})
+                    if(transaction){
+                        return res.status(201).json({message:"selling successfull", newBalance, transaction})
                     }
-                }else{
-                    return res.status(404).json({error:"insufficient quantity", entry})
+                }
+                const transaction = await prisma.portfolioEntry.update({
+                    where:{
+                        id:portfolioEntry.id
+                    },
+                    data:{
+                        quantity: newQuantity,
+                    }
+                })
+                const newBalance = await prisma.user.update({
+                    where:{id: userId},
+                    data:{
+                        balance: updatedAmt
+                    }
+                })
+                if(transaction){
+                    return res.status(201).json({message:"selling successfull", newBalance, transaction})
                 }
             }else{
-                return res.send("not portfolio")
+                return res.status(404).json({error:"insufficient quantity", portfolioEntry})
             }
+        }else{
+            return res.send("no portfolio")
         }
     } catch (error) {
         return res.status(500).json({message:"something went wrong while selling", err: error})
     }
 }
+

@@ -6,7 +6,7 @@ const Navbar = () => {
   return (
     <div className="w-60 border-r border-gray-800 h-full flex flex-col">
       <div className="p-5 border-b border-gray-800">
-        <h2 className="text-xl font-semibold text-gray-400">TRADING</h2>
+        <h2 className="text-xl font-semibold text-gray-400">TRADING💹</h2>
       </div>
       <nav className="flex-1 flex flex-col">
         <ul className='flex flex-col h-full'>

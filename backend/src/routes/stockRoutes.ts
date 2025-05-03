@@ -15,8 +15,8 @@ router.get("/search", (req, res, next) => {
 });
 
 // Company profile route
-router.get("/profile/:symbol", (req, res, next) => { 
-  getCompanyProfile(req, res).catch(next)
+router.get("/profile/:symbol", (req, res, next) => {
+  getCompanyProfile(req, res).catch(next);
 });
 
 // Stock quote route
@@ -29,10 +29,22 @@ router.get("/candles/:symbol", (req, res, next) => {
   getCandles(req, res).catch(next);
 });
 
-router.get("/all",async (req, res, next) => {
-  const stocks =  await prisma.stock.findMany();
+router.get("/all", async (req, res, next) => {
+  const stocks = await prisma.stock.findMany();
   console.log(stocks);
-  res.json({ message: "All stocks" , stocks });
+  res.json({ message: "All stocks", stocks });
+});
+
+router.get("/:symbol", (req, res, next) => {
+  const { symbol } = req.params;
+  prisma.stock
+    .findUnique({
+      where: { symbol },
+    })
+    .then((stock) => {
+      res.status(200).json(stock);
+    })
+    .catch(next);
 });
 
 export default router;

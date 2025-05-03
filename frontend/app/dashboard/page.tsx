@@ -3,9 +3,10 @@ import { useState, useEffect } from "react";
 import { SessionAuth } from "supertokens-auth-react/recipe/session";
 import { fetchUserInfo, fetchPortfolio } from "../utils/user-utils";
 import { UserInfoResponse, UserPortfolio } from "../shared/types/user-types";
-import io from 'socket.io-client';
 import Loader from "../_component_library/Loader";
 import useSocket from "@/app/_component_library/Socket";
+
+import StockCard, {Stock} from "@/components/StockCard";
 
 const WalletBalanceCard = ({ balance }: {balance: number}) => {
   return (
@@ -18,27 +19,6 @@ const WalletBalanceCard = ({ balance }: {balance: number}) => {
   );
 };
 
-const StockCard = ({ stock }: { stock: UserPortfolio["holdings"][0] }) => {
-  return (
-    <div className="bg-gray-900 p-4 rounded-lg flex items-center justify-between">
-      <div className="flex items-center">
-        <div className="w-10 h-10 rounded-full bg-green-900 flex items-center justify-center mr-4">
-          <span className="text-xl font-bold">{stock.symbol.charAt(0)}</span>
-        </div>
-        <div>
-          <p className="font-medium">{stock.name}</p>
-          <p className="text-sm text-gray-400">{stock.symbol}</p>
-        </div>
-      </div>
-      <div className="text-right">
-        <p className="font-medium">${stock.currentValue.toFixed(2)}</p>
-        <p className="text-sm text-gray-400">
-          {stock.quantity} shares @ ${stock.avgBuyPrice.toFixed(2)}
-        </p>
-      </div>
-    </div>
-  );
-};
 
 const Page = () => {
   const [portfolio, setPortfolio] = useState<UserPortfolio | null>(null);
@@ -69,6 +49,8 @@ const Page = () => {
       try {
         setLoading(true);
         const userData = await fetchUserInfo();
+        console.log("User Data:", userData);
+        
         if (userData?.userId) {
           const portfolioData = await fetchPortfolio(userData.userId);
           setPortfolio(portfolioData);
@@ -100,7 +82,7 @@ const Page = () => {
           {!loading && !error && portfolio && (
             <>
               <WalletBalanceCard 
-                balance={ 1000 }
+                balance={ portfolio.balance || 0 }
               />
               <h2 className="text-2xl font-semibold mb-4 text-gray-400">
                 Holdings
@@ -114,7 +96,7 @@ const Page = () => {
                     key={stock.id} 
                     stock={{
                       ...stock,
-                      currentValue: 100
+                      change: 30,
                     }} 
                   />
                 ))}

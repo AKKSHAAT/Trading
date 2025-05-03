@@ -128,6 +128,7 @@ export const handlePortfolio = async (req: Request, res: Response): Promise<void
             id: entry.id,
             symbol: entry.stock.symbol,
             name: entry.stock.name,
+            color: entry.stock.color,
             quantity: entry.quantity,
             avgBuyPrice: entry.avgBuyPrice,
             currentValue: entry.quantity * entry.avgBuyPrice,

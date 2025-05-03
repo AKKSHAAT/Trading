@@ -9,7 +9,7 @@ import { errorHandler } from "supertokens-node/framework/express";
 import prisma from "./lib/prisma";
 import userRoute from "./routes/userRoutes";
 import stockRoutes from "./routes/stockRoutes";
-import {deleteUser, listUsersByAccountInfo } from "supertokens-node";
+import transactionRotue from "./routes/transaction";
 
 import http from 'http';
 import { Server } from 'socket.io';
@@ -112,6 +112,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.use("/api/auth", userRoutes);
 app.use("/api/user", userRoute);
 app.use("/api/stocks", stockRoutes);
+app.use("/api/trade", transactionRotue);
 
 const server = http.createServer(app);
 

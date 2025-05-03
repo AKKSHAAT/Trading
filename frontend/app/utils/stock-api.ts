@@ -13,3 +13,5 @@ export interface GetAllStocksResponse {
 }
 
 export const getAllStocks = async (): Promise<GetAllStocksResponse> => api.get("/stocks/all");
+export const getStock = async (symbol: string): Promise<Stock> => api.get(`/stocks/${symbol}`);
+export const getStockProfile = async (symbol: string) => api.get(`/stocks/profile/${symbol}`);
