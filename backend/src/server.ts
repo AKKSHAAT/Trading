@@ -9,17 +9,13 @@ import { errorHandler } from "supertokens-node/framework/express";
 import prisma from "./lib/prisma";
 import userRoute from "./routes/userRoutes";
 import stockRoutes from "./routes/stockRoutes";
-import prisma from './lib/prisma';
-import userRoute from './routes/userRoutes';
-<<<<<<< Updated upstream
-// import stockRoutes from './routes/stockRoutes';
-// import { testFinnhubConnection } from './utils/finnhubUtils';
+
 import http from 'http';
 import { Server } from 'socket.io';
-=======
+
 import transactionRoute from "./routes/transaction"
 import socketConnection from './socket/socket';
->>>>>>> Stashed changes
+
 
 const app = express();
 const PORT = process.env.PORT;
@@ -94,12 +90,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/user", userRoute);
 app.use("/api/stocks", stockRoutes);
 
-<<<<<<< Updated upstream
-=======
-// app.use("/api/auth", userRoutes); 
-app.use('/api/user', userRoute);
-app.use('/api/stocks', transactionRoute);
->>>>>>> Stashed changes
 
 const server = http.createServer(app);
 
@@ -113,17 +103,9 @@ const io = new Server(server, {
 app.use(middleware());
 app.use(errorHandler());
 
-<<<<<<< Updated upstream
-// app.use("/api/auth", userRoutes); 
-app.use('/api/user', userRoute);
-// app.use('/api/stocks', stockRoutes);
 
-=======
-// app.use((req, res, next) => {
-//   req.io = io;
-//   next();
-// });
->>>>>>> Stashed changes
+app.use('/api/user', userRoute);
+
 
 
 app.get("/", (req, res) => {
@@ -166,8 +148,6 @@ async function connectDb() {
 }
 
 connectDb()
-<<<<<<< Updated upstream
-
 
 io.on('connection', (socket) => {
   console.log('✅ User connected:', socket.id);
@@ -191,19 +171,3 @@ server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-// app.listen(PORT, async () => {
-//   console.log(`Server is running on port ${PORT}`);
-  
-  // // Test Finnhub connection
-  // const finnhubConnected = await testFinnhubConnection();
-  // if (finnhubConnected) {
-  //   console.log('Finnhub API is ready to use');
-  // } else {
-  //   console.warn('Warning: Finnhub API connection failed. Check your API key and network connection.');
-  // }
-=======
-socketConnection(app);
-// app.listen(PORT, () => {
-//   console.log(`Server is running on port ${PORT}`);
->>>>>>> Stashed changes
-// });
