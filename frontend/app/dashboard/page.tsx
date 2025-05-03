@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { SessionAuth } from "supertokens-auth-react/recipe/session";
 import { fetchUserInfo, fetchPortfolio } from "../utils/user-utils";
 import { UserInfoResponse, UserPortfolio } from "../shared/types/user-types";
+import io from 'socket.io-client';
 import Loader from "../_component_library/Loader";
 import useSocket from "@/app/_component_library/Socket";
 
@@ -44,6 +45,25 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const socket = useSocket();
+  const [priceUpdates, setPriceUpdates] = useState<Record<string, string>>({});
+  const [socket, setSocket] = useState("")
+  
+  function initializeSocket(){
+    const newSocket = io("http://localhost:8000/");
+    setSocket({ socket: newSocket }); 
+  }
+  useEffect(() => {
+    if (!socket) {
+      initializeSocket(); // Initialize if socket doesn't exist
+      return;
+    }
+
+    if (!socket.connected) {
+      socket.connect(); // Ensure socket is connected
+    }
+
+    return socket.off()
+  }, [socket]);
 
   useEffect(() => {
     if (!socket) return;
@@ -72,7 +92,6 @@ const Page = () => {
           const portfolioData = await fetchPortfolio(userData.userId);
           setPortfolio(portfolioData);
         }
-
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to load dashboard data");
@@ -86,6 +105,21 @@ const Page = () => {
       socket.off('order_update');
     };
   }, [socket]);
+  }, []);
+
+  const getUpdatedValue = (stock: UserPortfolio["holdings"][0]) => {
+    const currentPrice = priceUpdates[stock.symbol];
+    console.log(`Checking price for ${stock.symbol}:`, {
+      currentPrice,
+      quantity: stock.quantity,
+      originalValue: stock.currentValue,
+      newValue: currentPrice ? parseFloat(currentPrice) * stock.quantity : stock.currentValue
+    });
+    if (currentPrice) {
+      return parseFloat(currentPrice) * stock.quantity;
+    }
+    return stock.currentValue;
+  };
 
   return (
     <SessionAuth>
@@ -98,19 +132,28 @@ const Page = () => {
 
           {!loading && !error && portfolio && (
             <>
-              <WalletBalanceCard balance={portfolio.balance} />
+              <WalletBalanceCard 
+                balance={
+                  portfolio.holdings.reduce((sum, stock) => 
+                    sum + getUpdatedValue(stock), 0)
+                } 
+              />
               <h2 className="text-2xl font-semibold mb-4 text-gray-400">
                 Holdings
               </h2>
               <div className="space-y-4">
-
                 {portfolio.holdings.length === 0 && (
                   <p>No stocks in your portfolio yet.</p>
                 )}
                 {portfolio.holdings.map((stock) => (
-                  <StockCard key={stock.id} stock={stock} />
+                  <StockCard 
+                    key={stock.id} 
+                    stock={{
+                      ...stock,
+                      currentValue: getUpdatedValue(stock)
+                    }} 
+                  />
                 ))}
-
               </div>
             </>
           )}
