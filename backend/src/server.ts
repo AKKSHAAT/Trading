@@ -89,6 +89,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.use("/api/auth", userRoutes);
 app.use("/api/user", userRoute);
 app.use("/api/stocks", stockRoutes);
+app.use("/api/stock",transactionRoute)
 
 
 const server = http.createServer(app);
@@ -120,21 +121,21 @@ async function dummyFactory(id: string) {
     },
   });
 
-  const stock = await prisma.stock.create({
-    data: {
-      symbol: "AAPL",
-      name: "Apple",
-    },
-  });
+  // const stock = await prisma.stock.create({
+  //   data: {
+  //     symbol: "",
+  //     name: "Apple",
+  //   },
+  // });
 
-  const portfolioEntry = await prisma.portfolioEntry.create({
-    data: {
-      portfolioId: portfolio.id,
-      stockId: stock.id,
-      quantity: 1,
-      avgBuyPrice: 150.0,
-    },
-  });
+  // const portfolioEntry = await prisma.portfolioEntry.create({
+  //   data: {
+  //     portfolioId: portfolio.id,
+  //     stockId: stock.id,
+  //     quantity: 1,
+  //     avgBuyPrice: 150.0,
+  //   },
+  // });
 }
 
 //neeonDb connection

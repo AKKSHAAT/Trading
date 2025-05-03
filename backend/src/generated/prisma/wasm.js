@@ -134,7 +134,8 @@ exports.Prisma.PortfolioScalarFieldEnum = {
 exports.Prisma.StockScalarFieldEnum = {
   id: 'id',
   symbol: 'symbol',
-  name: 'name'
+  name: 'name',
+  color: 'color'
 };
 
 exports.Prisma.PortfolioEntryScalarFieldEnum = {
