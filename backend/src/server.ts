@@ -9,12 +9,10 @@ import { errorHandler } from "supertokens-node/framework/express";
 import prisma from "./lib/prisma";
 import userRoute from "./routes/userRoutes";
 import stockRoutes from "./routes/stockRoutes";
+import {deleteUser, listUsersByAccountInfo } from "supertokens-node";
 
 import http from 'http';
 import { Server } from 'socket.io';
-
-import transactionRoute from "./routes/transaction"
-import socketConnection from './socket/socket';
 
 
 const app = express();
@@ -58,13 +56,38 @@ supertokens.init({
                 });
 
                 await dummyFactory(userId);
-                // await prisma.portfolio.create({
-                //   data:{
-                //     userId
-                //   }
-                // })
               }
 
+              return response;
+            },
+            signInPOST: async function (input) {
+              if (originalImplementation.signInPOST === undefined) {
+                throw Error("Should never come here");
+              }
+    
+              const response = await originalImplementation.signInPOST(input);
+    
+              if (response.status === "OK") {
+                const { user } = response;
+                const { id: userId } = user;
+                const email = user.emails?.[0];
+    
+                // Check if user already exists in DB
+                const existingUser = await prisma.user.findUnique({ where: { id: userId } });
+    
+                // If not, add or link user (use `upsert` if you want to be safe)
+                if (!existingUser) {
+                  await prisma.user.create({
+                    data: {
+                      id: userId,
+                      email,
+                    },
+                  });
+                  await dummyFactory(userId);
+                }
+    
+              }
+    
               return response;
             },
           };
@@ -89,7 +112,6 @@ app.use(express.urlencoded({ extended: true }));
 // app.use("/api/auth", userRoutes);
 app.use("/api/user", userRoute);
 app.use("/api/stocks", stockRoutes);
-
 
 const server = http.createServer(app);
 
@@ -119,22 +141,6 @@ async function dummyFactory(id: string) {
       userId: id,
     },
   });
-
-  const stock = await prisma.stock.create({
-    data: {
-      symbol: "AAPL",
-      name: "Apple",
-    },
-  });
-
-  const portfolioEntry = await prisma.portfolioEntry.create({
-    data: {
-      portfolioId: portfolio.id,
-      stockId: stock.id,
-      quantity: 1,
-      avgBuyPrice: 150.0,
-    },
-  });
 }
 
 //neeonDb connection
@@ -155,8 +161,6 @@ io.on('connection', (socket) => {
 
   socket.on('place_order', (data) => {
     console.log('📥 Order received:', data);
-        // process order or broadcast something
-    io.emit('order_update', { message: 'Order processed', data });
   });
 
   socket.on('disconnect', () => {

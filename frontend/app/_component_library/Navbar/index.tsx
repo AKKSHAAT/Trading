@@ -20,10 +20,10 @@ const Navbar = () => {
           </li>
           <li className="mb-2">
             <Link
-              href="/markets"
+              href="/market"
               className="block px-5 py-2 text-gray-400 hover:bg-gray-800"
             >
-              Markets
+              Market
             </Link>
           </li>
           <li className="mb-2">

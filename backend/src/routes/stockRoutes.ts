@@ -31,6 +31,7 @@ router.get("/candles/:symbol", (req, res, next) => {
 
 router.get("/all",async (req, res, next) => {
   const stocks =  await prisma.stock.findMany();
+  console.log(stocks);
   res.json({ message: "All stocks" , stocks });
 });
 

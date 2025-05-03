@@ -3386,18 +3386,21 @@ export namespace Prisma {
     id: number | null
     symbol: string | null
     name: string | null
+    color: string | null
   }
 
   export type StockMaxAggregateOutputType = {
     id: number | null
     symbol: string | null
     name: string | null
+    color: string | null
   }
 
   export type StockCountAggregateOutputType = {
     id: number
     symbol: number
     name: number
+    color: number
     _all: number
   }
 
@@ -3414,18 +3417,21 @@ export namespace Prisma {
     id?: true
     symbol?: true
     name?: true
+    color?: true
   }
 
   export type StockMaxAggregateInputType = {
     id?: true
     symbol?: true
     name?: true
+    color?: true
   }
 
   export type StockCountAggregateInputType = {
     id?: true
     symbol?: true
     name?: true
+    color?: true
     _all?: true
   }
 
@@ -3519,6 +3525,7 @@ export namespace Prisma {
     id: number
     symbol: string
     name: string
+    color: string
     _count: StockCountAggregateOutputType | null
     _avg: StockAvgAggregateOutputType | null
     _sum: StockSumAggregateOutputType | null
@@ -3544,6 +3551,7 @@ export namespace Prisma {
     id?: boolean
     symbol?: boolean
     name?: boolean
+    color?: boolean
     entries?: boolean | Stock$entriesArgs<ExtArgs>
     _count?: boolean | StockCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["stock"]>
@@ -3552,21 +3560,24 @@ export namespace Prisma {
     id?: boolean
     symbol?: boolean
     name?: boolean
+    color?: boolean
   }, ExtArgs["result"]["stock"]>
 
   export type StockSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     symbol?: boolean
     name?: boolean
+    color?: boolean
   }, ExtArgs["result"]["stock"]>
 
   export type StockSelectScalar = {
     id?: boolean
     symbol?: boolean
     name?: boolean
+    color?: boolean
   }
 
-  export type StockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "symbol" | "name", ExtArgs["result"]["stock"]>
+  export type StockOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "symbol" | "name" | "color", ExtArgs["result"]["stock"]>
   export type StockInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     entries?: boolean | Stock$entriesArgs<ExtArgs>
     _count?: boolean | StockCountOutputTypeDefaultArgs<ExtArgs>
@@ -3583,6 +3594,7 @@ export namespace Prisma {
       id: number
       symbol: string
       name: string
+      color: string
     }, ExtArgs["result"]["stock"]>
     composites: {}
   }
@@ -4010,6 +4022,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Stock", 'Int'>
     readonly symbol: FieldRef<"Stock", 'String'>
     readonly name: FieldRef<"Stock", 'String'>
+    readonly color: FieldRef<"Stock", 'String'>
   }
     
 
@@ -5615,7 +5628,8 @@ export namespace Prisma {
   export const StockScalarFieldEnum: {
     id: 'id',
     symbol: 'symbol',
-    name: 'name'
+    name: 'name',
+    color: 'color'
   };
 
   export type StockScalarFieldEnum = (typeof StockScalarFieldEnum)[keyof typeof StockScalarFieldEnum]
@@ -5826,6 +5840,7 @@ export namespace Prisma {
     id?: IntFilter<"Stock"> | number
     symbol?: StringFilter<"Stock"> | string
     name?: StringFilter<"Stock"> | string
+    color?: StringFilter<"Stock"> | string
     entries?: PortfolioEntryListRelationFilter
   }
 
@@ -5833,6 +5848,7 @@ export namespace Prisma {
     id?: SortOrder
     symbol?: SortOrder
     name?: SortOrder
+    color?: SortOrder
     entries?: PortfolioEntryOrderByRelationAggregateInput
   }
 
@@ -5843,6 +5859,7 @@ export namespace Prisma {
     OR?: StockWhereInput[]
     NOT?: StockWhereInput | StockWhereInput[]
     name?: StringFilter<"Stock"> | string
+    color?: StringFilter<"Stock"> | string
     entries?: PortfolioEntryListRelationFilter
   }, "id" | "symbol">
 
@@ -5850,6 +5867,7 @@ export namespace Prisma {
     id?: SortOrder
     symbol?: SortOrder
     name?: SortOrder
+    color?: SortOrder
     _count?: StockCountOrderByAggregateInput
     _avg?: StockAvgOrderByAggregateInput
     _max?: StockMaxOrderByAggregateInput
@@ -5864,6 +5882,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Stock"> | number
     symbol?: StringWithAggregatesFilter<"Stock"> | string
     name?: StringWithAggregatesFilter<"Stock"> | string
+    color?: StringWithAggregatesFilter<"Stock"> | string
   }
 
   export type PortfolioEntryWhereInput = {
@@ -6045,6 +6064,7 @@ export namespace Prisma {
   export type StockCreateInput = {
     symbol: string
     name: string
+    color?: string
     entries?: PortfolioEntryCreateNestedManyWithoutStockInput
   }
 
@@ -6052,12 +6072,14 @@ export namespace Prisma {
     id?: number
     symbol: string
     name: string
+    color?: string
     entries?: PortfolioEntryUncheckedCreateNestedManyWithoutStockInput
   }
 
   export type StockUpdateInput = {
     symbol?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
     entries?: PortfolioEntryUpdateManyWithoutStockNestedInput
   }
 
@@ -6065,6 +6087,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     symbol?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
     entries?: PortfolioEntryUncheckedUpdateManyWithoutStockNestedInput
   }
 
@@ -6072,17 +6095,20 @@ export namespace Prisma {
     id?: number
     symbol: string
     name: string
+    color?: string
   }
 
   export type StockUpdateManyMutationInput = {
     symbol?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
   }
 
   export type StockUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     symbol?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
   }
 
   export type PortfolioEntryCreateInput = {
@@ -6309,6 +6335,7 @@ export namespace Prisma {
     id?: SortOrder
     symbol?: SortOrder
     name?: SortOrder
+    color?: SortOrder
   }
 
   export type StockAvgOrderByAggregateInput = {
@@ -6319,12 +6346,14 @@ export namespace Prisma {
     id?: SortOrder
     symbol?: SortOrder
     name?: SortOrder
+    color?: SortOrder
   }
 
   export type StockMinOrderByAggregateInput = {
     id?: SortOrder
     symbol?: SortOrder
     name?: SortOrder
+    color?: SortOrder
   }
 
   export type StockSumOrderByAggregateInput = {
@@ -6918,12 +6947,14 @@ export namespace Prisma {
   export type StockCreateWithoutEntriesInput = {
     symbol: string
     name: string
+    color?: string
   }
 
   export type StockUncheckedCreateWithoutEntriesInput = {
     id?: number
     symbol: string
     name: string
+    color?: string
   }
 
   export type StockCreateOrConnectWithoutEntriesInput = {
@@ -6970,12 +7001,14 @@ export namespace Prisma {
   export type StockUpdateWithoutEntriesInput = {
     symbol?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
   }
 
   export type StockUncheckedUpdateWithoutEntriesInput = {
     id?: IntFieldUpdateOperationsInput | number
     symbol?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
   }
 
   export type PortfolioEntryCreateManyPortfolioInput = {
