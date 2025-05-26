@@ -1,61 +1,7 @@
 import { getStock, getStockProfile } from "@/app/utils/stock-api";
-
+import { StockProfile } from "@/types/stocks";
 import React from "react";
-
-interface StockProfile {
-  Symbol: string;
-  AssetType: string;
-  Name: string;
-  Description: string;
-  Exchange: string;
-  Currency: string;
-  Country: string;
-  Sector: string;
-  Industry: string;
-  Address: string;
-  OfficialSite: string;
-  FiscalYearEnd: string;
-  LatestQuarter: string;
-  MarketCapitalization: string;
-  EBITDA: string;
-  PERatio: string;
-  PEGRatio: string;
-  BookValue: string;
-  DividendPerShare: string;
-  DividendYield: string;
-  EPS: string;
-  RevenuePerShareTTM: string;
-  ProfitMargin: string;
-  OperatingMarginTTM: string;
-  ReturnOnAssetsTTM: string;
-  ReturnOnEquityTTM: string;
-  RevenueTTM: string;
-  GrossProfitTTM: string;
-  DilutedEPSTTM: string;
-  QuarterlyEarningsGrowthYOY: string;
-  QuarterlyRevenueGrowthYOY: string;
-  AnalystTargetPrice: string;
-  TrailingPE: string;
-  ForwardPE: string;
-  PriceToSalesRatioTTM: string;
-  PriceToBookRatio: string;
-  EVToRevenue: string;
-  EVToEBITDA: string;
-  Beta: string;
-  "52WeekHigh": string;
-  "52WeekLow": string;
-  "50DayMovingAverage": string;
-  "200DayMovingAverage": string;
-  SharesOutstanding: string;
-  DividendDate: string;
-  ExDividendDate: string;
-  AnalystRatingStrongBuy: string;
-  AnalystRatingBuy: string;
-  AnalystRatingHold: string;
-  AnalystRatingSell: string;
-  AnalystRatingStrongSell: string;
-}
-
+import Chart from "@/components/Chart/";
 // Format market cap for display
 const formatLargeNumber = (numStr: string): string => {
   if (numStr === "None" || !numStr) return "N/A";
@@ -89,7 +35,7 @@ export default async function StockProfilePage({
   params: { symbol: string };
 }) {
   const symbol = params?.symbol;
-  const profileData: StockProfile = await getStockProfile(symbol);
+  const profileData = await getStockProfile(symbol);
   const stockData = await getStock(symbol);
   const performance = calculatePerformance(profileData);
 
@@ -116,6 +62,8 @@ export default async function StockProfilePage({
           </div>
         </div>
 
+        
+        <Chart />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           {/* Price Overview Card */}
           <div className="bg-gray-900 p-6 rounded-lg">

@@ -33,7 +33,7 @@ const StockCard = ({ stock }: { stock: Stock }) => {
           <div>
             <div className="flex items-center gap-3">
               <p className="font-medium">{stock.name}</p>
-              <p>💼x{ stock?.quantity}</p>
+              {stock.quantity &&  <p>💼x{ stock?.quantity}</p> }
             </div>
             <p className="text-sm text-gray-400">{stock.symbol}</p>
           </div>
