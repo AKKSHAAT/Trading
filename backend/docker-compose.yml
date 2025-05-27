@@ -1,0 +1,8 @@
+
+services:
+  supertokens-core:
+    image: supertokens/supertokens-postgresql
+    ports:
+      - "3567:3567"
+    env_file:
+      - .env
