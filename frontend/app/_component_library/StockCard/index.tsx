@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import BSButtons from "../BS-Buttons";
 import OrderModal from "../OrderModal";
 
@@ -16,7 +16,8 @@ export interface Stock {
 
 const StockCard = ({ stock }: { stock: Stock }) => {
   const isPositive = stock.change >= 0;
-  const [showModal, setShowModal] = React.useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [order, setOrder] = useState<"buy" | "sell">("buy");
   console.log("StockCard props:", stock);
 
   const redirect = () => {
@@ -38,7 +39,7 @@ const StockCard = ({ stock }: { stock: Stock }) => {
               <p className="font-medium">{stock.name}</p>
               {stock.quantity && <p>💼x{stock?.quantity}</p>}
               <div >
-                <BSButtons onBuyClick={()=> setShowModal(true)} onSellClick={()=> setShowModal(true)}/>
+                <BSButtons onBuyClick={()=> {setShowModal(true); setOrder('buy')}} onSellClick={()=> {setShowModal(true); setOrder('sell')}}/>
               </div>
             </div>
             <p className="text-sm text-gray-400">{stock.symbol}</p>
@@ -72,7 +73,7 @@ const StockCard = ({ stock }: { stock: Stock }) => {
           </p>
         </div>
       </div>
-      {showModal && <OrderModal stockName={stock.name} stockSymbol={stock.symbol} closeModal={()=>setShowModal(false)} />}
+      {showModal && <OrderModal stockName={stock.name} stockSymbol={stock.symbol} closeModal={()=>setShowModal(false)} action={order}/>}
     </>
   );
 };

@@ -197,7 +197,7 @@ export const handleLimitOrder = async (req: TradingRequest, res: Response, next:
             console.log(matched);
             try {
                 const result = await executeBuyOrder({
-                    order.userId,
+                    userId, symbol, quantity, price
                 })
             } catch (error) {
                 
