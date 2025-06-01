@@ -1,4 +1,4 @@
-import { marketBuyOrder, marketSellOrder } from "@/app/utils/order-api";
+import { limitBuyOrder, limitSellOrder, marketBuyOrder, marketSellOrder } from "@/app/utils/order-api";
 import { fetchUserInfo } from "@/app/utils/user-utils";
 import React, { useState } from "react";
 
@@ -32,9 +32,9 @@ const OrderModal: React.FC<OrderModalProps> = ({
       userId: userData.userId,
     }
     if (activeAction === "sell") {
-    const sold = await marketSellOrder(order)
+    const sold = await limitSellOrder(order)
     } else {
-      const bought = await marketBuyOrder(order);
+      const bought = await limitBuyOrder(order);
     }
     setLoading(false);
     closeModal();
